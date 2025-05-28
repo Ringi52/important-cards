@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Test - ImportantCards.app</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="container">
+                <a href="index.html" class="logo">ImportantCards.app</a>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="game-container-wide">
+                <div class="game-header">
+                    <div class="language-switcher">
+                        <span id="language-label">Jazyk:</span>
+                        <select id="language-select">
+                            <option value="cs">Čeština</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <h1 class="game-card-title" id="page-title">Test psaní</h1>
+                    </div>
+                    <div class="game-card-content space-y-6">
+                        <div id="start-screen" class="text-center">
+                            <button class="btn btn-primary w-full" id="start-btn" onclick="startTest()">Začít psaní</button>
+                        </div>
+
+                        <div id="countdown-screen" class="hidden text-center">
+                            <div class="text-6xl font-bold" id="countdown">3</div>
+                        </div>
+
+                        <div id="test-screen" class="hidden space-y-4">
+                            <div class="result-box">
+                                <div class="font-mono text-lg" id="sentence-display"></div>
+                            </div>
+
+                            <input type="text" class="form-input font-mono" id="typing-input" placeholder="Začněte psát..." disabled>
+
+                            <div id="result-display" class="hidden text-center space-y-2">
+                                <div class="text-2xl font-bold" id="wpm-result"></div>
+                                <div class="text-lg" id="accuracy-result"></div>
+                                <button class="btn btn-primary w-full" onclick="resetTest()">Resetovat</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 ringi.dev with AI help</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+    <script>
+        let currentSentence = '';
+        let startTime = null;
+        let isActive = false;
+
+        function updateTypingTestPage() {
+            const lang = getCurrentLanguage();
+            document.getElementById('language-label').textContent = t('language');
+            document.getElementById('page-title').textContent = t('typingTest');
+            document.getElementById('start-btn').textContent = t('startTyping');
+            document.getElementById('typing-input').placeholder = 'Začněte psát...';
+        }
+
+        function startTest() {
+            const sentences = t('typingSentences');
+            currentSentence = sentences[Math.floor(Math.random() * sentences.length)];
+            
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('countdown-screen').classList.remove('hidden');
+            
+            let countdown = 3;
+            const countdownInterval = setInterval(() => {
+                document.getElementById('countdown').textContent = countdown;
+                countdown--;
+                
+                if (countdown < 0) {
+                    clearInterval(countdownInterval);
+                    startTyping();
+                }
+            }, 1000);
+        }
+
+        function startTyping() {
+            document.getElementById('countdown-screen').classList.add('hidden');
+            document.getElementById('test-screen').classList.remove('hidden');
+            
+            displaySentence();
+            
+            const typingInput = document.getElementById('typing-input');
+            typingInput.disabled = false;
+            typingInput.focus();
+            
+            isActive = true;
+            startTime = Date.now();
+            
+            typingInput.addEventListener('input', handleInput);
+        }
+
+        function displaySentence() {
+            const sentenceDisplay = document.getElementById('sentence-display');
+            sentenceDisplay.innerHTML = currentSentence.split('').map((char, index) => 
+                `<span id="char-${index}">${char}</span>`
+            ).join('');
+        }
+
+        function handleInput(event) {
+            if (!isActive) return;
+            
+            const userInput = event.target.value;
+            const sentenceChars = document.querySelectorAll('[id^="char-"]');
+            
+            // Color the characters
+            for (let i = 0; i < sentenceChars.length; i++) {
+                const char = sentenceChars[i];
+                if (i < userInput.length) {
+                    if (userInput[i] === currentSentence[i]) {
+                        char.style.color = '#16a34a'; // green
+                        char.style.backgroundColor = 'transparent';
+                    } else {
+                        char.style.color = '#dc2626'; // red
+                        char.style.backgroundColor = '#fee2e2'; // light red background
+                    }
+                } else {
+                    char.style.color = '';
+                    char.style.backgroundColor = '';
+                }
+            }
+            
+            // Check if completed
+            if (userInput === currentSentence) {
+                finishTest(userInput);
+            }
+        }
+
+        function finishTest(userInput) {
+            if (!startTime) return;
+            
+            isActive = false;
+            const endTime = Date.now();
+            const timeInMinutes = (endTime - startTime) / 60000;
+            
+            const wordsTyped = currentSentence.split(' ').length;
+            const wpm = Math.round(wordsTyped / timeInMinutes);
+            
+            let correctChars = 0;
+            for (let i = 0; i < Math.min(userInput.length, currentSentence.length); i++) {
+                if (userInput[i] === currentSentence[i]) {
+                    correctChars++;
+                }
+            }
+            const accuracy = Math.round((correctChars / currentSentence.length) * 100);
+            
+            document.getElementById('wpm-result').textContent = `${wpm} ${t('wpm')}`;
+            document.getElementById('accuracy-result').textContent = `${t('accuracy')}: ${accuracy}%`;
+            document.getElementById('result-display').classList.remove('hidden');
+            
+            document.getElementById('typing-input').disabled = true;
+        }
+
+        function resetTest() {
+            document.getElementById('test-screen').classList.add('hidden');
+            document.getElementById('result-display').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+            
+            document.getElementById('typing-input').value = '';
+            document.getElementById('typing-input').removeEventListener('input', handleInput);
+            
+            currentSentence = '';
+            startTime = null;
+            isActive = false;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTypingTestPage();
+            
+            const languageSelect = document.getElementById('language-select');
+            languageSelect.value = getCurrentLanguage();
+            languageSelect.addEventListener('change', function() {
+                setLanguage(this.value);
+                updateTypingTestPage();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors - ImportantCards.app</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="container">
+                <a href="index.html" class="logo">ImportantCards.app</a>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="game-container">
+                <div class="game-header">
+                    <div class="language-switcher">
+                        <span id="language-label">Jazyk:</span>
+                        <select id="language-select">
+                            <option value="cs">Čeština</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <h1 class="game-card-title" id="page-title">Kámen nůžky papír</h1>
+                    </div>
+                    <div class="game-card-content space-y-6">
+                        <div id="game-result" class="text-center space-y-2 hidden">
+                            <div id="player-choice"></div>
+                            <div id="ai-choice"></div>
+                            <div class="text-xl font-bold" id="result-message"></div>
+                        </div>
+
+                        <div class="choices-grid">
+                            <button class="btn btn-outline choice-btn" onclick="playGame('rock')">
+                                <div class="choice-emoji">🪨</div>
+                                <div class="choice-text" id="rock-text">Kámen</div>
+                            </button>
+                            <button class="btn btn-outline choice-btn" onclick="playGame('paper')">
+                                <div class="choice-emoji">📄</div>
+                                <div class="choice-text" id="paper-text">Papír</div>
+                            </button>
+                            <button class="btn btn-outline choice-btn" onclick="playGame('scissors')">
+                                <div class="choice-emoji">✂️</div>
+                                <div class="choice-text" id="scissors-text">Nůžky</div>
+                            </button>
+                        </div>
+
+                        <div class="stats" id="stats-display">
+                            vítězství: 0 | prohry: 0 | remízy: 0
+                        </div>
+
+                        <button class="btn btn-outline w-full hidden" id="reset-btn" onclick="resetGame()">Resetovat</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 ringi.dev with AI help</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+    <script>
+        let playerHistory = [];
+        let stats = { wins: 0, losses: 0, ties: 0 };
+
+        const choices = ["rock", "paper", "scissors"];
+        const emojis = { rock: "🪨", paper: "📄", scissors: "✂️" };
+
+        function updateRPSPage() {
+            const lang = getCurrentLanguage();
+            document.getElementById('language-label').textContent = t('language');
+            document.getElementById('page-title').textContent = t('rockPaperScissors');
+            document.getElementById('rock-text').textContent = t('rock');
+            document.getElementById('paper-text').textContent = t('paper');
+            document.getElementById('scissors-text').textContent = t('scissors');
+            document.getElementById('reset-btn').textContent = t('reset');
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('stats-display').textContent = 
+                `${t('wins')}: ${stats.wins} | ${t('losses')}: ${stats.losses} | ${t('ties')}: ${stats.ties}`;
+        }
+
+        function predictPlayerChoice() {
+            if (playerHistory.length < 3) {
+                return choices[Math.floor(Math.random() * 3)];
+            }
+
+            // Simple pattern detection: look for the most common choice in recent history
+            const recent = playerHistory.slice(-5);
+            const counts = { rock: 0, paper: 0, scissors: 0 };
+            recent.forEach(choice => counts[choice]++);
+
+            const mostCommon = Object.entries(counts).reduce((a, b) =>
+                counts[a[0]] > counts[b[0]] ? a : b
+            )[0];
+
+            // Counter the predicted choice
+            switch (mostCommon) {
+                case "rock": return "paper";
+                case "paper": return "scissors";
+                case "scissors": return "rock";
+            }
+        }
+
+        function playGame(playerChoice) {
+            const aiChoice = predictPlayerChoice();
+            playerHistory.push(playerChoice);
+
+            let gameResult;
+            if (playerChoice === aiChoice) {
+                gameResult = "tie";
+            } else if (
+                (playerChoice === "rock" && aiChoice === "scissors") ||
+                (playerChoice === "paper" && aiChoice === "rock") ||
+                (playerChoice === "scissors" && aiChoice === "paper")
+            ) {
+                gameResult = "win";
+            } else {
+                gameResult = "lose";
+            }
+
+            // Update stats
+            if (gameResult === "win") stats.wins++;
+            else if (gameResult === "lose") stats.losses++;
+            else stats.ties++;
+
+            // Display results
+            document.getElementById('player-choice').textContent = 
+                `${t('youChose')}: ${emojis[playerChoice]} ${t(playerChoice)}`;
+            document.getElementById('ai-choice').textContent = 
+                `${t('aiChose')}: ${emojis[aiChoice]} ${t(aiChoice)}`;
+            
+            let resultText = '';
+            if (gameResult === "win") resultText = t('youWon');
+            else if (gameResult === "lose") resultText = t('youLost');
+            else resultText = t('tie');
+            
+            document.getElementById('result-message').textContent = resultText;
+            document.getElementById('game-result').classList.remove('hidden');
+            document.getElementById('reset-btn').classList.remove('hidden');
+
+            updateStats();
+        }
+
+        function resetGame() {
+            document.getElementById('game-result').classList.add('hidden');
+            document.getElementById('reset-btn').classList.add('hidden');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateRPSPage();
+            
+            const languageSelect = document.getElementById('language-select');
+            languageSelect.value = getCurrentLanguage();
+            languageSelect.addEventListener('change', function() {
+                setLanguage(this.value);
+                updateRPSPage();
+            });
+        });
+    </script>
+</body>
+</html>

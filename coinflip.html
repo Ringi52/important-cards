@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coinflip - ImportantCards.app</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="container">
+                <a href="index.html" class="logo">ImportantCards.app</a>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="game-container">
+                <div class="game-header">
+                    <div class="language-switcher">
+                        <span id="language-label">Jazyk:</span>
+                        <select id="language-select">
+                            <option value="cs">Čeština</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <h1 class="game-card-title" id="page-title">Hod mincí</h1>
+                    </div>
+                    <div class="game-card-content space-y-4">
+                        <div class="form-group">
+                            <label class="form-label" id="fairness-label">Férnost: 50% Panna</label>
+                            <div class="slider-container">
+                                <input type="range" class="slider" id="fairness-slider" min="0" max="100" value="50" oninput="updateFairness()">
+                                <div class="slider-labels">
+                                    <span id="unfair-tails">Nefér (Orel)</span>
+                                    <span id="fair-label">Férová</span>
+                                    <span id="unfair-heads">Nefér (Panna)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <div class="text-6xl mb-4" id="coin-display">🪙</div>
+                            <div class="text-2xl font-bold" id="result-text"></div>
+                        </div>
+
+                        <button class="btn btn-primary w-full" id="flip-btn" onclick="flipCoin()">Hodit</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 ringi.dev with AI help</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+    <script>
+        let isFlipping = false;
+        let fairness = 50;
+
+        function updateCoinflipPage() {
+            const lang = getCurrentLanguage();
+            document.getElementById('language-label').textContent = t('language');
+            document.getElementById('page-title').textContent = t('coinflip');
+            document.getElementById('flip-btn').textContent = isFlipping ? '...' : t('flip');
+            document.getElementById('fair-label').textContent = t('fair');
+            document.getElementById('unfair-tails').textContent = `${t('unfair')} (${t('tails')})`;
+            document.getElementById('unfair-heads').textContent = `${t('unfair')} (${t('heads')})`;
+            updateFairness();
+        }
+
+        function updateFairness() {
+            fairness = parseInt(document.getElementById('fairness-slider').value);
+            document.getElementById('fairness-label').textContent = `${t('fairness')}: ${fairness}% ${t('heads')}`;
+        }
+
+        function flipCoin() {
+            if (isFlipping) return;
+            
+            isFlipping = true;
+            document.getElementById('flip-btn').textContent = '...';
+            document.getElementById('flip-btn').disabled = true;
+            document.getElementById('result-text').textContent = '';
+            document.getElementById('coin-display').textContent = '🪙';
+            
+            setTimeout(() => {
+                const random = Math.random() * 100;
+                const result = random < fairness ? "heads" : "tails";
+                
+                document.getElementById('coin-display').textContent = result === "heads" ? "👑" : "🦅";
+                document.getElementById('result-text').textContent = result === "heads" ? t('heads') : t('tails');
+                
+                isFlipping = false;
+                document.getElementById('flip-btn').textContent = t('flip');
+                document.getElementById('flip-btn').disabled = false;
+            }, 1000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCoinflipPage();
+            
+            const languageSelect = document.getElementById('language-select');
+            languageSelect.value = getCurrentLanguage();
+            languageSelect.addEventListener('change', function() {
+                setLanguage(this.value);
+                updateCoinflipPage();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Converter - ImportantCards.app</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="container">
+                <a href="index.html" class="logo">ImportantCards.app</a>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="game-container">
+                <div class="game-header">
+                    <div class="language-switcher">
+                        <span id="language-label">Jazyk:</span>
+                        <select id="language-select">
+                            <option value="cs">Čeština</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <h1 class="game-card-title" id="page-title">Převod textu</h1>
+                    </div>
+                    <div class="game-card-content space-y-4">
+                        <div class="form-group">
+                            <label class="form-label" id="conversion-type-label">Typ převodu</label>
+                            <select class="form-select" id="conversion-type" onchange="updateShiftVisibility()">
+                                <option value="morse" id="morse-option">Morseovka</option>
+                                <option value="caesar" id="caesar-option">Caesarova šifra</option>
+                                <option value="atbash" id="atbash-option">Atbash</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group hidden" id="shift-group">
+                            <label class="form-label" id="shift-label">Posun: 3</label>
+                            <div class="slider-container">
+                                <input type="range" class="slider" id="shift-slider" min="1" max="25" value="3" oninput="updateShift()">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="text" class="form-input" id="input-text" placeholder="Zadej text">
+                            <button class="btn btn-primary w-full mt-2" onclick="convertText()">Převést text</button>
+                        </div>
+
+                        <div id="output-display" class="result-box hidden">
+                            <div class="font-mono text-lg" style="word-break: break-all;" id="output-text"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 ringi.dev with AI help</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const morseCode = {
+            'a': '.-', 'b': '-...', 'c': '-.-.', 'd': '-..', 'e': '.', 'f': '..-.',
+            'g': '--.', 'h': '....', 'i': '..', 'j': '.---', 'k': '-.-', 'l': '.-..',
+            'm': '--', 'n': '-.', 'o': '---', 'p': '.--.', 'q': '--.-', 'r': '.-.',
+            's': '...', 't': '-', 'u': '..-', 'v': '...-', 'w': '.--', 'x': '-..-',
+            'y': '-.--', 'z': '--..', '0': '-----', '1': '.----', '2': '..---',
+            '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...',
+            '8': '---..', '9': '----.', '.': '.-.-.-', ',': '--..--', '?': '..--..',
+            "'": '.----.', '!': '-.-.--', '/': '-..-.', '(': '-.--.', ')': '-.--.-',
+            '&': '.-...', ':': '---...', ';': '-.-.-.', '=': '-...-', '+': '.-.-.',
+            '-': '-....-', '_': '..--.-', '"': '.-..-.', '$': '...-..-', '@': '.--.-.',
+            ' ': '/'
+        };
+
+        function updateTextConverterPage() {
+            const lang = getCurrentLanguage();
+            document.getElementById('language-label').textContent = t('language');
+            document.getElementById('page-title').textContent = t('textConverter');
+            document.getElementById('conversion-type-label').textContent = t('conversionType');
+            document.getElementById('morse-option').textContent = t('morse');
+            document.getElementById('caesar-option').textContent = t('caesar');
+            document.getElementById('atbash-option').textContent = t('atbash');
+            document.getElementById('input-text').placeholder = t('inputText');
+            document.querySelector('button[onclick="convertText()"]').textContent = t('convertText');
+            updateShift();
+        }
+
+        function updateShiftVisibility() {
+            const conversionType = document.getElementById('conversion-type').value;
+            const shiftGroup = document.getElementById('shift-group');
+            
+            if (conversionType === 'caesar') {
+                shiftGroup.classList.remove('hidden');
+            } else {
+                shiftGroup.classList.add('hidden');
+            }
+        }
+
+        function updateShift() {
+            const shift = document.getElementById('shift-slider').value;
+            document.getElementById('shift-label').textContent = `${t('shift')}: ${shift}`;
+        }
+
+        function convertToMorse(text) {
+            return text.toLowerCase().split('').map(char => morseCode[char] || char).join(' ');
+        }
+
+        function caesarCipher(text, shift) {
+            return text.split('').map(char => {
+                const code = char.charCodeAt(0);
+                if (code >= 65 && code <= 90) {
+                    return String.fromCharCode(((code - 65 + shift) % 26) + 65);
+                } else if (code >= 97 && code <= 122) {
+                    return String.fromCharCode(((code - 97 + shift) % 26) + 97);
+                }
+                return char;
+            }).join('');
+        }
+
+        function atbashCipher(text) {
+            return text.split('').map(char => {
+                const code = char.charCodeAt(0);
+                if (code >= 65 && code <= 90) {
+                    return String.fromCharCode(90 - (code - 65));
+                } else if (code >= 97 && code <= 122) {
+                    return String.fromCharCode(122 - (code - 97));
+                }
+                return char;
+            }).join('');
+        }
+
+        function convertText() {
+            const inputText = document.getElementById('input-text').value;
+            if (!inputText) return;
+
+            const conversionType = document.getElementById('conversion-type').value;
+            const shift = parseInt(document.getElementById('shift-slider').value);
+
+            let result = '';
+            switch (conversionType) {
+                case 'morse':
+                    result = convertToMorse(inputText);
+                    break;
+                case 'caesar':
+                    result = caesarCipher(inputText, shift);
+                    break;
+                case 'atbash':
+                    result = atbashCipher(inputText);
+                    break;
+            }
+
+            document.getElementById('output-text').textContent = result;
+            document.getElementById('output-display').classList.remove('hidden');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTextConverterPage();
+            updateShiftVisibility();
+            
+            const languageSelect = document.getElementById('language-select');
+            languageSelect.value = getCurrentLanguage();
+            languageSelect.addEventListener('change', function() {
+                setLanguage(this.value);
+                updateTextConverterPage();
+            });
+        });
+    </script>
+</body>
+</html>

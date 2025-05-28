@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Useless Button - ImportantCards.app</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="container">
+                <a href="index.html" class="logo">ImportantCards.app</a>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="game-container">
+                <div class="game-header">
+                    <div class="language-switcher">
+                        <span id="language-label">Jazyk:</span>
+                        <select id="language-select">
+                            <option value="cs">Čeština</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <h1 class="game-card-title" id="page-title">Zbytečné tlačítko</h1>
+                    </div>
+                    <div class="game-card-content space-y-6">
+                        <div class="text-center space-y-4">
+                            <button class="btn btn-outline w-full" style="height: 5rem; font-size: 1.25rem;" id="useless-btn" onclick="handleClick()">Klikni na mě</button>
+
+                            <div id="message-display" class="result-box hidden">
+                                <div class="text-lg" id="current-message"></div>
+                            </div>
+
+                            <div class="text-sm" style="color: #6b7280;" id="click-counter">Clicks: 0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 ringi.dev with AI help</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+    <script>
+        let clickCount = 0;
+
+        function updateUselessButtonPage() {
+            const lang = getCurrentLanguage();
+            document.getElementById('language-label').textContent = t('language');
+            document.getElementById('page-title').textContent = t('uselessButton');
+            document.getElementById('useless-btn').textContent = t('clickMe');
+        }
+
+        function handleClick() {
+            clickCount++;
+            document.getElementById('click-counter').textContent = `Clicks: ${clickCount}`;
+
+            // 5% chance something happens
+            if (Math.random() < 0.05) {
+                document.getElementById('current-message').textContent = "🎉 Něco se stalo! Gratulace! 🎉";
+            } else {
+                const messages = t('uselessMessages');
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                document.getElementById('current-message').textContent = randomMessage;
+            }
+
+            document.getElementById('message-display').classList.remove('hidden');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUselessButtonPage();
+            
+            const languageSelect = document.getElementById('language-select');
+            languageSelect.value = getCurrentLanguage();
+            languageSelect.addEventListener('change', function() {
+                setLanguage(this.value);
+                updateUselessButtonPage();
+            });
+        });
+    </script>
+</body>
+</html>
