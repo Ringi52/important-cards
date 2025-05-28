@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DnD Dice Roller - ImportantCards.app</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="container">
+                <a href="index.html" class="logo">ImportantCards.app</a>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="game-container">
+                <div class="game-header">
+                    <div class="language-switcher">
+                        <span id="language-label">Jazyk:</span>
+                        <select id="language-select">
+                            <option value="cs">Čeština</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <h1 class="game-card-title" id="page-title">DnD kostky</h1>
+                    </div>
+                    <div class="game-card-content space-y-4">
+                        <div class="form-group">
+                            <label class="form-label" id="dice-type-label">Vyberte typ kostky</label>
+                            <select class="form-select" id="dice-type">
+                                <option value="4">D4</option>
+                                <option value="6">D6</option>
+                                <option value="8">D8</option>
+                                <option value="10">D10</option>
+                                <option value="12">D12</option>
+                                <option value="20" selected>D20</option>
+                                <option value="100">D100</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" id="dice-count-label">Počet kostek</label>
+                            <input type="number" class="form-input" id="dice-count" min="1" max="10" value="1">
+                        </div>
+
+                        <button class="btn btn-primary w-full" id="roll-btn" onclick="rollDice()">Hodit</button>
+
+                        <div id="results" class="hidden">
+                            <div class="result-box">
+                                <div class="result-large" id="total-result"></div>
+                                <div class="dice-results" id="dice-results"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 ringi.dev with AI help</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+    <script>
+        let isRolling = false;
+
+        function updateDicePageLanguage() {
+            const lang = getCurrentLanguage();
+            document.getElementById('language-label').textContent = t('language');
+            document.getElementById('page-title').textContent = t('dndDiceRoller');
+            document.getElementById('dice-type-label').textContent = t('selectDiceType');
+            document.getElementById('dice-count-label').textContent = t('numberOfDice');
+            document.getElementById('roll-btn').textContent = isRolling ? '...' : t('roll');
+            
+            const resultLabel = document.getElementById('result-label');
+            if (resultLabel) {
+                resultLabel.textContent = t('result') + ':';
+            }
+        }
+
+        function rollDice() {
+            if (isRolling) return;
+            
+            isRolling = true;
+            document.getElementById('roll-btn').textContent = '...';
+            document.getElementById('roll-btn').disabled = true;
+            
+            // Play dice sound
+            playSound('https://assets.mixkit.co/active_storage/sfx/3125/3125-preview.mp3', 0.2);
+            
+            setTimeout(() => {
+                const diceType = parseInt(document.getElementById('dice-type').value);
+                const diceCount = parseInt(document.getElementById('dice-count').value);
+                
+                const results = [];
+                for (let i = 0; i < diceCount; i++) {
+                    results.push(Math.floor(Math.random() * diceType) + 1);
+                }
+                
+                const total = results.reduce((sum, roll) => sum + roll, 0);
+                
+                // Display results
+                const resultsDiv = document.getElementById('results');
+                const totalResult = document.getElementById('total-result');
+                const diceResults = document.getElementById('dice-results');
+                
+                totalResult.innerHTML = `<span id="result-label">${t('result')}:</span> ${total}`;
+                
+                diceResults.innerHTML = '';
+                results.forEach(result => {
+                    const diceDiv = document.createElement('div');
+                    diceDiv.className = 'dice-result';
+                    
+                    if (diceType === 6) {
+                        // Show dice icons for D6
+                        const diceIcons = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+                        diceDiv.textContent = diceIcons[result - 1];
+                    } else {
+                        diceDiv.textContent = result;
+                    }
+                    
+                    diceResults.appendChild(diceDiv);
+                });
+                
+                resultsDiv.classList.remove('hidden');
+                
+                isRolling = false;
+                document.getElementById('roll-btn').textContent = t('roll');
+                document.getElementById('roll-btn').disabled = false;
+            }, 800);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDicePageLanguage();
+            
+            const languageSelect = document.getElementById('language-select');
+            languageSelect.value = getCurrentLanguage();
+            languageSelect.addEventListener('change', function() {
+                setLanguage(this.value);
+                updateDicePageLanguage();
+            });
+        });
+    </script>
+</body>
+</html>

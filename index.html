@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImportantCards.app</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="container">
+                <a href="index.html" class="logo">ImportantCards.app</a>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="container">
+                <div class="page-header">
+                    <h1 id="cards-title">Karty</h1>
+                    <div class="language-switcher">
+                        <span id="language-label">Jazyk:</span>
+                        <select id="language-select">
+                            <option value="cs">Čeština</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="cards-grid">
+                    <a href="dice-roller.html" class="card-link">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="dice-5"></i>
+                                    <span id="card-dice">DnD kostky</span>
+                                </div>
+                                <p class="card-description">D4, D6, D8, D10, D12, D20, D100</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-secondary" id="try-it-1">Vyzkoušej →</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="notepad.html" class="card-link">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="file-text"></i>
+                                    <span id="card-notepad">Poznámkový blok</span>
+                                </div>
+                                <p class="card-description" id="card-notepad-desc">Napiš si co chceš</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-secondary" id="try-it-2">Vyzkoušej →</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="language-switcher.html" class="card-link">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="globe"></i>
+                                    <span id="card-language">Přepínač jazyků</span>
+                                </div>
+                                <p class="card-description">Hello, Bonjour, Hola, Ciao...</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-secondary" id="try-it-3">Vyzkoušej →</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="monty-hall.html" class="card-link">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="split-square-vertical"></i>
+                                    <span id="card-monty">Monty Hall simulátor</span>
+                                </div>
+                                <p class="card-description" id="card-monty-desc">Klasický paradox</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-secondary" id="try-it-4">Vyzkoušej →</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="coinflip.html" class="card-link">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="coins"></i>
+                                    <span id="card-coinflip">Hod mincí</span>
+                                </div>
+                                <p class="card-description" id="card-coinflip-desc">Férová nebo nefér mince</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-secondary" id="try-it-5">Vyzkoušej →</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="rock-paper-scissors.html" class="card-link">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="hand"></i>
+                                    <span id="card-rps">Kámen nůžky papír</span>
+                                </div>
+                                <p class="card-description" id="card-rps-desc">AI se učí tvé vzorce</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-secondary" id="try-it-6">Vyzkoušej →</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="click-speed-test.html" class="card-link">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="mouse-pointer"></i>
+                                    <span id="card-click">Test rychlosti klikání</span>
+                                </div>
+                                <p class="card-description" id="card-click-desc">Jak rychle klikáš?</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-secondary" id="try-it-7">Vyzkoušej →</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="startup-idea.html" class="card-link">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="lightbulb"></i>
+                                    <span id="card-startup">Startup nápad</span>
+                                </div>
+                                <p class="card-description" id="card-startup-desc">Bizarní nápady na startup</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-secondary" id="try-it-8">Vyzkoušej →</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="useless-button.html" class="card-link">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="circle-help"></i>
+                                    <span id="card-useless">Zbytečné tlačítko</span>
+                                </div>
+                                <p class="card-description" id="card-useless-desc">Možná něco udělá</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-secondary" id="try-it-9">Vyzkoušej →</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="text-converter.html" class="card-link">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="lock"></i>
+                                    <span id="card-text">Převod textu</span>
+                                </div>
+                                <p class="card-description" id="card-text-desc">Šifrování textu</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-secondary" id="try-it-10">Vyzkoušej →</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="typing-test.html" class="card-link">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="keyboard"></i>
+                                    <span id="card-typing">Test psaní</span>
+                                </div>
+                                <p class="card-description" id="card-typing-desc">Rychlé psaní náročných vět</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-secondary" id="try-it-11">Vyzkoušej →</button>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="insult-generator.html" class="card-link">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i data-lucide="message-square"></i>
+                                    <span id="card-insult">Generátor urážek</span>
+                                </div>
+                                <p class="card-description" id="card-insult-desc">Roztomile urážlivé hlášky</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-secondary" id="try-it-12">Vyzkoušej →</button>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 ringi.dev with AI help</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
